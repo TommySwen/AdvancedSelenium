@@ -16,7 +16,7 @@ namespace TestProject1
         {
             // Topic 1: start chrome in headless mode
             var chromeOptions = new ChromeOptions();
-            //chromeOptions.AddArguments("headless");
+            chromeOptions.AddArguments("headless");
             chromeOptions.BinaryLocation = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
             driver = new ChromeDriver(chromeOptions);
         }
