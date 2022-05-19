@@ -3,9 +3,22 @@ port = 5555
 
 [node]
 max-session = 3
-detect-drivers = true
+detect-drivers = false
 
+[[node.driver-configuration]]
+display-name = "firefox"
+stereotype = '{"browserName": "firefox", "platformName": "WIN10", "browserVersion":"100", "networkname:applicationName":"node_1", "nodename:applicationName":"app_1" }'
+max-sessions = 5
 
+[[node.driver-configuration]]
+display-name = "chrome"
+stereotype = '{"browserName": "chrome", "platformName": "WIN10", "browserVersion":"101", "networkname:applicationName":"node_1", "nodename:applicationName":"app_1" }'
+max-sessions = 5
+
+[[node.driver-configuration]]
+display-name = "msedge"
+stereotype = '{"browserName": "msedge", "platformName": "WIN10", "browserVersion":"101", "networkname:applicationName":"node_1", "nodename:applicationName":"app_1" }'
+max-sessions = 5
 
 
 
