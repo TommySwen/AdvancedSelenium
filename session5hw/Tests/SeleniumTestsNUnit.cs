@@ -1,8 +1,17 @@
 using CognizantSoftvision.Maqs.BaseSeleniumTest;
 using CognizantSoftvision.Maqs.BaseSeleniumTest.Extensions;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Edge;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Remote;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System;
+using System.Drawing;
+using OpenQA.Selenium.Interactions;
+
+
+using System.Collections.Generic; 
 
 namespace Tests
 {
@@ -16,17 +25,40 @@ namespace Tests
         /// open new invoice page and take screenshot - creating 2 pages.
         /// </summary>
         [Test]
-        public void createbookingtest()
+        [TestCase("Chrome")]
+        //[TestCase("FireFox")]
+        //[TestCase("edge")]
+        public void createbookingtest(String browser)
         {
+            if (browser == "Chrome")
+            {
+                ChromeOptions cop = new ChromeOptions();
+                this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), cop);
+            }
+            else if (browser == "FireFox")
+            {
+                FirefoxOptions fop = new FirefoxOptions();
+                this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), fop);
+            }
+            else if (browser == "edge")
+            {
+                EdgeOptions eop = new EdgeOptions();
+                this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), eop);
+            }
+            System.Threading.Thread.Sleep(6000);
+            WebDriver.Manage().Window.Maximize();
             WebDriver.Navigate().GoToUrl("https://phptravels.net/");
             login();
             createbooking();
             Assert.IsTrue(WebDriver.FindElement(By.XPath("//*[@id='fadein']/section[1]/div/div/div/div/div[3]/div[1]/h3")).Text.Contains("Booking Invoice"));
         }
 
-        [Test]
+        //[Test]
         public void screenshotInvoice()
         {
+            FirefoxOptions fop = new FirefoxOptions();
+            this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), fop);
+
             WebDriver.Navigate().GoToUrl("https://phptravels.net/");
             login();
 
@@ -67,6 +99,7 @@ namespace Tests
             IWebElement submitloginbutton = WebDriver.FindElement(By.XPath("//*[@id='fadein']/div[1]/div/div[2]/div[2]/div/form/div[3]/button"));
             submitloginbutton.Click();
         }
+
         public void createbooking()
         {
             IWebElement hotelButton = WebDriver.Wait().ForElementExist(By.XPath("//*[@id='fadein']/header/div[2]/div/div/div/div/div[2]/nav/ul/li[2]/a"));
@@ -98,15 +131,23 @@ namespace Tests
             bookbutton.Click();
 
             WebDriver.Wait().UntilPageLoad();
-            ElementHandler.ScrollIntoView(this.WebDriver, By.XPath("//*[@id='myTab']/div[1]"));
+/*            ElementHandler.ScrollIntoView(this.WebDriver, By.XPath("//*[@id='myTab']/div[1]"));
             IWebElement banktransfercheckbox = WebDriver.FindElement(By.XPath("//*[@id='myTab']/div[1]/div/label/div"));
             System.Threading.Thread.Sleep(1000);
-            banktransfercheckbox.Click();
+            banktransfercheckbox.Click();*/
 
             ElementHandler.ScrollIntoView(this.WebDriver, By.XPath("//*[@id='booking']"));
+/*            IWebElement unclickable = WebDriver.FindElement(By.XPath("//*[@id='fadein']/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label"));
+            Point p = unclickable.Location;*/
 
-            ElementHandler.CheckCheckBox(this.WebDriver, By.XPath("//*[@id='fadein']/div[2]/form/section/div/div/div[1]/div[4]/div/div/div"), true);
+/*            Actions a = new Actions(WebDriver);
+            a.MoveToElement(unclickable);
+            a.MoveByOffset(-10, 0);
+            a.Perform();*/
 
+            ElementHandler.CheckCheckBox(this.WebDriver, By.XPath("//*[@id='fadein']/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label"), true);
+            //*[@id='fadein']/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label/text()
+            //*[@id="fadein"]/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label
             WebDriver.FindElement(By.XPath("//*[@id='booking']")).Click();
 
             WebDriver.Wait().UntilPageLoad();
