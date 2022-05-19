@@ -1,1 +1,1 @@
-start java -jar "C:/Selenium/selenium-server-4.1.4.jar" standalone --config "C:/Users/tommy.swenson/Source/repos/session5hw/session5hw/Tests/GridThings/serverconfig.toml"
+start java -jar "C:/Selenium/selenium-server-4.1.4.jar" standalone --config "C:\Users\tommy.swenson\Source\AdvancedSelenium\session5hw\Tests\GridThings\serverconfig.toml"

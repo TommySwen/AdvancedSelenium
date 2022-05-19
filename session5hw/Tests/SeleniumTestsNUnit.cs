@@ -9,7 +9,7 @@ using NUnit.Framework;
 using System;
 using System.Drawing;
 using OpenQA.Selenium.Interactions;
-
+using PageModel;
 
 using System.Collections.Generic; 
 
@@ -22,10 +22,11 @@ namespace Tests
     public class SeleniumTestsNUnit : BaseSeleniumTest
     {
         /// <summary>
-        /// open new invoice page and take screenshot - creating 2 pages.
+        /// create new booking could not find an area to specify wine bottles.
+        /// once the room is booked this test fails because the room is marked as already reserved, so cannot reserve again.
         /// </summary>
-        [Test]
-        [TestCase("Chrome")]
+        //[Test]
+        //[TestCase("Chrome")]
         //[TestCase("FireFox")]
         //[TestCase("edge")]
         public void createbookingtest(String browser)
@@ -47,110 +48,52 @@ namespace Tests
             }
             System.Threading.Thread.Sleep(6000);
             WebDriver.Manage().Window.Maximize();
-            WebDriver.Navigate().GoToUrl("https://phptravels.net/");
-            login();
-            createbooking();
-            Assert.IsTrue(WebDriver.FindElement(By.XPath("//*[@id='fadein']/section[1]/div/div/div/div/div[3]/div[1]/h3")).Text.Contains("Booking Invoice"));
-        }
 
-        //[Test]
-        public void screenshotInvoice()
-        {
-            FirefoxOptions fop = new FirefoxOptions();
-            this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), fop);
+            LoginPageModel lpm = new LoginPageModel(TestObject);
+            lpm.OpenPage();
 
-            WebDriver.Navigate().GoToUrl("https://phptravels.net/");
-            login();
-
-            IWebElement bookingTab = WebDriver.FindElement(By.XPath("//*[@id='fadein']/div[1]/div/div[3]/ul/li[2]/a"));
-            bookingTab.Click();
-
-            WebDriver.Wait().UntilPageLoad();
-
-            IWebElement viewVoucherButton = WebDriver.FindElement(By.XPath("//*[@id='fadein']/section[1]/div/div[2]/div/div[1]/div/div/div[2]/div/table/tbody/tr/td[4]/div/a"));
-            viewVoucherButton.Click();
-            WebDriver.SwitchTo().Window(WebDriver.WindowHandles[1]);
-
-            IWebElement sicko = WebDriver.FindElement(By.XPath("//*[@id='fadein']/section[1]/div/div/div/div/div[2]/div[1]/h3"));
-            IWebElement oowee = WebDriver.FindElement(By.XPath("//*[@id='fadein']/section[1]"));
-
-            this.WebDriver.CaptureScreenshot(this.TestObject, "C:/Users/tommy.swenson/Pictures", "Screencap", ScreenshotImageFormat.Png);
-            WebDriver.SwitchTo().Window(WebDriver.WindowHandles[0]);
-
-            Assert.IsTrue(WebDriver.FindElement(By.XPath("//*[@id='fadein']/section[1]/div/div[1]/div/div[1]/div[1]/div/div/h2")).Displayed);
-        }
-
-        public void login()
-        {
-            IWebElement loginbutton = WebDriver.FindElement(By.XPath("//*[@id='fadein']/header/div[1]/div/div/div[2]/div/div/a[2]"));
-            loginbutton.Click();
-
-
-            ElementHandler.SetTextBox(this.WebDriver, By.XPath("//*[@id='fadein']/div[1]/div/div[2]/div[2]/div/form/div[1]/div/input"), "user@phptravels.com");
-            /*IWebElement email = WebDriver.FindElement(By.XPath("//*[@id='fadein']/div[1]/div/div[2]/div[2]/div/form/div[1]/div/input"));
-            email.Click();
-            email.SendKeys("//*[@id='fadein']/div[1]/div/div[2]/div[2]/div/form/div[1]/div/input");*/
-
-            ElementHandler.SetTextBox(this.WebDriver, By.XPath("//*[@id='fadein']/div[1]/div/div[2]/div[2]/div/form/div[2]/div[1]/input"), "demouser");
-            /*IWebElement pass = WebDriver.FindElement(By.XPath("//*[@id='fadein']/div[1]/div/div[2]/div[2]/div/form/div[2]/div[1]/input"));
-            pass.Click();
-            pass.SendKeys("demouser");*/
-
-            IWebElement submitloginbutton = WebDriver.FindElement(By.XPath("//*[@id='fadein']/div[1]/div/div[2]/div[2]/div/form/div[3]/button"));
-            submitloginbutton.Click();
-        }
-
-        public void createbooking()
-        {
-            IWebElement hotelButton = WebDriver.Wait().ForElementExist(By.XPath("//*[@id='fadein']/header/div[2]/div/div/div/div/div[2]/nav/ul/li[2]/a"));
-            hotelButton.Click();
-
-
-            IWebElement searchHotelTextBox = WebDriver.Wait().ForElementExist(By.XPath("//*[@id='select2-hotels_city-container']"));
-            searchHotelTextBox.Click();
-
-            IWebElement searchHotelTextBoxClicked = WebDriver.Wait().ForElementExist(By.XPath("//*[@id='fadein']/span/span/span[1]/input"));
-            searchHotelTextBoxClicked.SendKeys("islamabad");
-
+            AccountDashboardPageModel dpm = lpm.loginWithCred("user@phptravels.com", "demouser");
+            HotelSearchPageModel hspm = dpm.OpenHotelSearchPage();
+            HotelSearchResultsPage hsrpm = hspm.SearchForGivenHotel("islamabad");
+            DetailsHotelPageModel dhpm = hsrpm.OpenDetailsPage();
+            BookingPageModel bpm = dhpm.OpenBookingPage();
+            BookingConfirmationPage bcp = bpm.CompleteBooking();
             System.Threading.Thread.Sleep(6000);
+            Assert.IsTrue(bcp.getConfirmation().Contains("Booking Invoice"));
+        }
 
-            IWebElement dropdown_select = WebDriver.Wait().ForElementExist(By.XPath("//*[@id='fadein']/span/span/span[2]"));
-            dropdown_select.Click();
-
-            IWebElement SearchHotelButton = WebDriver.FindElement(By.XPath("//*[@id='submit']/span[1]"));
-            SearchHotelButton.Click();
-
-            IWebElement detailsButton = WebDriver.Wait().ForElementExist(By.XPath("//*[@id='islamabad marriott hotel']/div/div[2]/div/div[2]/div/a"));
-            detailsButton.Click();
-
-            WebDriver.Wait().UntilPageLoad();
-            ElementHandler.ScrollIntoView(this.WebDriver, By.XPath("//*[@id='availability']/div[2]"));
-
-            IWebElement bookbutton = WebDriver.Wait().ForElementExist(By.XPath("//*[@id='availability']/div[2]/div[1]/div[2]/div/div[2]/form/div/div[4]/div/div/button/span[1]"));
+        [Test]
+        [TestCase("edge")]
+        [TestCase("Chrome")]
+        [TestCase("FireFox")]
+        public void screenshotInvoice(string browser)
+        {
+            if (browser == "Chrome")
+            {
+                ChromeOptions cop = new ChromeOptions();
+                this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), cop);
+            }
+            else if (browser == "FireFox")
+            {
+                FirefoxOptions fop = new FirefoxOptions();
+                this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), fop);
+            }
+            else if (browser == "edge")
+            {
+                EdgeOptions eop = new EdgeOptions();
+                this.WebDriver = new RemoteWebDriver(new Uri("http://localhost:5555"), eop);
+            }
             System.Threading.Thread.Sleep(6000);
-            bookbutton.Click();
+            WebDriver.Manage().Window.Maximize();
 
-            WebDriver.Wait().UntilPageLoad();
-/*            ElementHandler.ScrollIntoView(this.WebDriver, By.XPath("//*[@id='myTab']/div[1]"));
-            IWebElement banktransfercheckbox = WebDriver.FindElement(By.XPath("//*[@id='myTab']/div[1]/div/label/div"));
-            System.Threading.Thread.Sleep(1000);
-            banktransfercheckbox.Click();*/
+            LoginPageModel lpm = new LoginPageModel(TestObject);
+            lpm.OpenPage();
+            AccountDashboardPageModel dpm = lpm.loginWithCred("user@phptravels.com", "demouser");
+            BookingsModel bm = dpm.OpenBookingTab();
+            VoucherPageModel vpm = bm.OpenBookingVoucher();
+            vpm.CaptureVoucherScreenshot();
 
-            ElementHandler.ScrollIntoView(this.WebDriver, By.XPath("//*[@id='booking']"));
-/*            IWebElement unclickable = WebDriver.FindElement(By.XPath("//*[@id='fadein']/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label"));
-            Point p = unclickable.Location;*/
-
-/*            Actions a = new Actions(WebDriver);
-            a.MoveToElement(unclickable);
-            a.MoveByOffset(-10, 0);
-            a.Perform();*/
-
-            ElementHandler.CheckCheckBox(this.WebDriver, By.XPath("//*[@id='fadein']/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label"), true);
-            //*[@id='fadein']/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label/text()
-            //*[@id="fadein"]/div[2]/form/section/div/div/div[1]/div[4]/div/div/div/label
-            WebDriver.FindElement(By.XPath("//*[@id='booking']")).Click();
-
-            WebDriver.Wait().UntilPageLoad();
+            Assert.IsTrue(vpm.IsVoucherDisplayed() == true);
         }
     }
 }
